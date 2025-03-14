@@ -1,4 +1,4 @@
-import express from 'express';
+import express from "express";
 const router = express.Router();
 import {
   createUser,
@@ -6,18 +6,31 @@ import {
   saveBook,
   deleteBook,
   login,
-} from '../../controllers/user-controller.js';
+} from "../../controllers/user-controller.js";
 
 // import middleware
-import { authenticateToken } from '../../services/auth.js';
+import { authenticateToken } from "../../services/auth.js";
 
-// put authMiddleware anywhere we need to send a token for verification of user
-router.route('/').post(createUser).put(authenticateToken, saveBook);
+// Wrap route handlers to prevent returning Response objects
+router
+  .route("/")
+  .post((req, res) => {
+    createUser(req, res);
+  })
+  .put(authenticateToken, (req, res) => {
+    saveBook(req, res);
+  });
 
-router.route('/login').post(login);
+router.route("/login").post((req, res) => {
+  login(req, res);
+});
 
-router.route('/me').get(authenticateToken, getSingleUser);
+router.route("/me").get(authenticateToken, (req, res) => {
+  getSingleUser(req, res);
+});
 
-router.route('/books/:bookId').delete(authenticateToken, deleteBook);
+router.route("/books/:bookId").delete(authenticateToken, (req, res) => {
+  deleteBook(req, res);
+});
 
 export default router;

@@ -1,6 +1,16 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "exactOptionalPropertyTypes": false,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+
     /* Modules */
     "rootDir": "src" /* Specify the root folder within your source files. */,
 
