@@ -22,6 +22,15 @@ interface AddUserArgs {
   password: string;
 }
 
+interface BookInput {
+  bookId: string;
+  title: string;
+  authors: string[];
+  description: string;
+  image: string;
+  link: string;
+}
+
 const resolvers = {
   Query: {
     me: async (_: any, __: any, context: MyContext) => {
@@ -56,7 +65,11 @@ const resolvers = {
       return { token, user };
     },
 
-    saveBook: async (_: any, { bookData }: any, context: MyContext) => {
+    saveBook: async (
+      _: any,
+      { bookData }: { bookData: BookInput },
+      context: MyContext
+    ) => {
       if (!context.user) {
         throw new AuthenticationError("You need to be logged in!");
       }
