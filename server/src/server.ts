@@ -18,6 +18,12 @@ const server = new ApolloServer({
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Import routes
+import routes from "./routes/index.js";
+
+// Use routes
+app.use(routes);
+
 // If we're in production, serve client/build as static assets
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../client/build")));

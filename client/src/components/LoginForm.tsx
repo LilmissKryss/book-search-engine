@@ -28,19 +28,24 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
     event.preventDefault();
     // check if form has everything
     try {
-      const response = await loginUser({
+      console.log("Submitting login form with data:", {
+        email: userFormData.email,
+        password: userFormData.password ? "********" : "",
+      });
+
+      // Use Apollo client for GraphQL
+      const { token, user } = await loginUser({
         email: userFormData.email,
         password: userFormData.password,
       });
 
-      if (!response.ok) {
-        throw new Error("something went wrong!");
-      }
-      // get the token from the response
-      const { token } = await response.json();
+      console.log("Login successful:", {
+        token: token ? "[TOKEN]" : "null",
+        user,
+      });
       Auth.login(token);
     } catch (err) {
-      console.error(err);
+      console.error("Login error:", err);
       setShowAlert(true);
     }
   };

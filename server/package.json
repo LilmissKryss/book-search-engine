@@ -9,5 +9,11 @@
     "start": "npm run build && node dist/server.js",
     "dev": "tsc-watch --onSuccess \"node dist/server.js\"",
     "watch": "nodemon dist/server.js"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/jsonwebtoken": "^9.0.9",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2"
   }
 }

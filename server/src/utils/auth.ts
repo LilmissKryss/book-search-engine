@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
-const secret = process.env.JWT_SECRET || "supersecret";
+const secret =
+  process.env.JWT_SECRET_KEY || process.env.JWT_SECRET || "supersecret";
 const expiration = "2h";
 
 export const signToken = (user: any) => {
@@ -15,7 +16,6 @@ export const authMiddleware = (
   res?: Response | undefined,
   next?: NextFunction
 ): Request | null | Response | void => {
-  // <-- Ensure function returns something
   let token =
     req.headers.authorization?.split("Bearer ")[1] ||
     (req.query.token as string);
@@ -39,8 +39,8 @@ export const authMiddleware = (
   }
 
   if (next) {
-    return next(); // Ensure Express continues execution
+    return next();
   }
 
-  return req; // Return the request object for Apollo context
+  return req;
 };

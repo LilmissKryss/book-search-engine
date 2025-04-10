@@ -28,22 +28,26 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
     event.preventDefault();
 
     try {
-      const response = await createUser({
+      console.log("Submitting form with data:", {
+        username: userFormData.username,
+        email: userFormData.email,
+        password: userFormData.password ? "********" : "",
+      });
+
+      // Use Apollo client for GraphQL
+      const { token, user } = await createUser({
         username: userFormData.username,
         email: userFormData.email,
         password: userFormData.password,
-        savedBooks: [],
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "something went wrong!");
-      }
-
-      Auth.login(data.token);
+      console.log("Signup successful:", {
+        token: token ? "[TOKEN]" : "null",
+        user,
+      });
+      Auth.login(token);
     } catch (err) {
-      console.error(err);
+      console.error("Signup error:", err);
       setShowAlert(true);
     }
   };

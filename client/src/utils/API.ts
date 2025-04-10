@@ -1,26 +1,38 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
-import { gql } from '@apollo/client';
+import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import { gql } from "@apollo/client";
+import type { User } from "./types";
 
 // Create Apollo Client
-const httpLink = createHttpLink({
-  uri: '/graphql',
-});
+export const createApolloClient = () => {
+  // In test environment, return a mock client
+  if (process.env.NODE_ENV === "test") {
+    return new ApolloClient({
+      cache: new InMemoryCache(),
+    });
+  }
 
-const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem('id_token');
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : '',
-    },
-  };
-});
+  const httpLink = createHttpLink({
+    uri: "http://localhost:3001/graphql",
+  });
 
-const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
-});
+  const authLink = setContext((_, { headers }) => {
+    const token = localStorage.getItem("id_token");
+    return {
+      headers: {
+        ...headers,
+        authorization: token ? `Bearer ${token}` : "",
+      },
+    };
+  });
+
+  return new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache(),
+  });
+};
+
+const client = createApolloClient();
 
 // GraphQL Queries and Mutations
 const LOGIN_USER = gql`
@@ -110,19 +122,23 @@ const REMOVE_BOOK = gql`
 `;
 
 // API Functions
-export const getMe = async () => {
+export const getMe = async (): Promise<User> => {
   try {
     const { data } = await client.query({
       query: GET_ME,
     });
     return data.me;
   } catch (err) {
-    console.error('Error fetching user data:', err);
+    console.error("Error fetching user data:", err);
     throw err;
   }
 };
 
-export const createUser = async (userData: { username: string; email: string; password: string }) => {
+export const createUser = async (userData: {
+  username: string;
+  email: string;
+  password: string;
+}): Promise<{ token: string; user: User }> => {
   try {
     const { data } = await client.mutate({
       mutation: ADD_USER,
@@ -134,12 +150,15 @@ export const createUser = async (userData: { username: string; email: string; pa
     });
     return data.addUser;
   } catch (err) {
-    console.error('Error creating user:', err);
+    console.error("Error creating user:", err);
     throw err;
   }
 };
 
-export const loginUser = async (userData: { email: string; password: string }) => {
+export const loginUser = async (userData: {
+  email: string;
+  password: string;
+}): Promise<{ token: string; user: User }> => {
   try {
     const { data } = await client.mutate({
       mutation: LOGIN_USER,
@@ -150,12 +169,17 @@ export const loginUser = async (userData: { email: string; password: string }) =
     });
     return data.login;
   } catch (err) {
-    console.error('Error logging in:', err);
+    console.error("Error logging in:", err);
     throw err;
   }
 };
 
-export const saveBook = async (bookData: any) => {
+export const saveBook = async (bookData: {
+  bookId: string;
+  title: string;
+  authors: string[];
+  description: string;
+}): Promise<User> => {
   try {
     const { data } = await client.mutate({
       mutation: SAVE_BOOK,
@@ -165,12 +189,12 @@ export const saveBook = async (bookData: any) => {
     });
     return data.saveBook;
   } catch (err) {
-    console.error('Error saving book:', err);
+    console.error("Error saving book:", err);
     throw err;
   }
 };
 
-export const deleteBook = async (bookId: string) => {
+export const deleteBook = async (bookId: string): Promise<User> => {
   try {
     const { data } = await client.mutate({
       mutation: REMOVE_BOOK,
@@ -180,12 +204,12 @@ export const deleteBook = async (bookId: string) => {
     });
     return data.removeBook;
   } catch (err) {
-    console.error('Error deleting book:', err);
+    console.error("Error deleting book:", err);
     throw err;
   }
 };
 
-// Google Books API search 
+// Google Books API search
 export const searchGoogleBooks = (query: string) => {
   return fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}`);
 };

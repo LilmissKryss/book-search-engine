@@ -60,9 +60,20 @@ const resolvers = {
     },
 
     addUser: async (_: any, { username, email, password }: AddUserArgs) => {
-      const user = await User.create({ username, email, password });
-      const token = signToken(user);
-      return { token, user };
+      try {
+        console.log("Creating user with:", { username, email, password });
+        const user = await User.create({ username, email, password });
+        console.log("User created:", user);
+        const token = signToken(user);
+        console.log(
+          "Token generated:",
+          token ? "Token created successfully" : "Token creation failed"
+        );
+        return { token, user };
+      } catch (error) {
+        console.error("Error in addUser resolver:", error);
+        throw error;
+      }
     },
 
     saveBook: async (
